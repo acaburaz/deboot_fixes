@@ -53,6 +53,12 @@ Deploy scripts (ours):
 - Model string (`/etc/fw.manifest` → `product`): **`AI_px30`**
 - robotinfo.dev id `ecovacs.x5d34r`, codename ZJ1913
 
+## Support
+
+If these notes saved your robot (or a repair bill), you can buy me a coffee ☕
+
+[![Buy me a coffee](https://img.shields.io/badge/Buy_me_a_coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black)](https://donate.stripe.com/dRm4gzd6Ufx49uBfo76g800)
+
 ## Credits
 
 - Dennis Giese & braelynn — *Reverse engineering and hacking Ecovacs robots*,
