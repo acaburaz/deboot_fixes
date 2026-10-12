@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 460" font-family="sans-serif" role="img" aria-label="Ecovacs deboot debug header UART pinout">
+  <defs>
+    <style>
+      .bg{fill:#101418}
+      .panel{fill:#2a2f35;stroke:#4a525b;stroke-width:2}
+      .board{fill:#13472e;stroke:#0c2e1e;stroke-width:2}
+      .pad{fill:#d9b36b;stroke:#8a6d33;stroke-width:1.5}
+      .padC{fill:#c9ccd1;stroke:#7d828a;stroke-width:1.5}
+      .usb{fill:#1b1f24;stroke:#8a9099;stroke-width:2}
+      .lbl{fill:#e8eaed;font-size:16px;font-weight:600}
+      .cyan{fill:#4fc3e8;font-size:18px;font-weight:700}
+      .red{fill:#ff6b6b;font-size:15px;font-weight:700}
+      .mut{fill:#aeb4bc;font-size:12px}
+      .ttl{fill:#e8eaed;font-size:17px;font-weight:700}
+      .ok{fill:#7ee081;font-size:13px;font-weight:600}
+      .box{fill:none;stroke-width:2}
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="680" height="460" rx="10"/>
+  <text class="ttl" x="20" y="30">Ecovacs "deboot" (T8 AIVI / AI_px30) — debug header</text>
+  <text class="mut" x="20" y="50">Redrawn reference (facts only). Verify against your board &amp; DEF CON 32 slide 87. 3.3 V TTL · 115200 8N1.</text>
+
+  <!-- service-panel area -->
+  <rect class="panel" x="40" y="70" width="330" height="330" rx="10"/>
+
+  <!-- debug PCB -->
+  <rect class="board" x="90" y="95" width="230" height="150" rx="6"/>
+
+  <!-- 2x4 header: 2 columns x 4 rows -->
+  <!-- left column x=135, right column x=185 ; rows y=120,155,190 (top 3 shown as header), -->
+  <!-- top row: GND (left), 3.3V (right) -->
+  <circle class="pad" cx="135" cy="125" r="11"/>
+  <circle class="pad" cx="185" cy="125" r="11"/>
+  <!-- second row: RX (left), TX (right) -->
+  <circle class="padC" cx="135" cy="160" r="11"/>
+  <circle class="pad"  cx="185" cy="160" r="11"/>
+  <!-- two more unused rows -->
+  <circle class="pad" cx="135" cy="195" r="11"/>
+  <circle class="pad" cx="185" cy="195" r="11"/>
+
+  <!-- highlight boxes -->
+  <rect class="box" x="122" y="112" width="26" height="26" rx="4" stroke="#e8eaed"/>
+  <rect class="box" x="172" y="112" width="26" height="26" rx="4" stroke="#ff6b6b"/>
+  <rect class="box" x="122" y="147" width="26" height="26" rx="4" stroke="#ffffff"/>
+  <rect class="box" x="172" y="147" width="26" height="26" rx="4" stroke="#7ee081"/>
+
+  <!-- pad labels -->
+  <text class="lbl" x="205" y="118">GND</text>
+  <text class="red" x="205" y="132">3.3V (do NOT connect)</text>
+  <text class="lbl" x="205" y="165">RX &nbsp; TX</text>
+
+  <text class="cyan" x="96" y="230">UART</text>
+
+  <!-- MicroUSB on this board -->
+  <rect class="usb" x="150" y="210" width="110" height="24" rx="5"/>
+  <text class="red" x="150" y="250">MicroUSB</text>
+
+  <!-- second (lower) connector -->
+  <rect class="board" x="120" y="300" width="170" height="80" rx="6"/>
+  <circle class="pad" cx="150" cy="325" r="8"/>
+  <circle class="pad" cx="175" cy="325" r="8"/>
+  <circle class="pad" cx="200" cy="325" r="8"/>
+  <circle class="pad" cx="225" cy="325" r="8"/>
+  <rect class="usb" x="160" y="345" width="90" height="20" rx="5"/>
+
+  <!-- warning + wiring legend -->
+  <text class="red" x="410" y="110">Make sure the rotation/alignment</text>
+  <text class="red" x="410" y="130">is correct — some units are 180° rotated!</text>
+
+  <line x1="300" y1="125" x2="400" y2="118" stroke="#4f91ff" stroke-width="3"/>
+
+  <text class="ttl" x="410" y="185">Wiring</text>
+  <text class="ok"  x="410" y="212">✓ adapter GND  → board GND</text>
+  <text class="ok"  x="410" y="236">✓ adapter TX   → board RX</text>
+  <text class="ok"  x="410" y="260">✓ adapter RX   → board TX</text>
+  <text class="red" x="410" y="286">✗ leave 3.3V / VCC disconnected</text>
+  <text class="mut" x="410" y="312">(power the robot from its own battery;</text>
+  <text class="mut" x="410" y="330"> share ground only — adapter set to 3.3 V)</text>
+
+  <text class="mut" x="410" y="372">No output? → swap TX/RX, check GND,</text>
+  <text class="mut" x="410" y="390"> or try the 180°-rotated orientation.</text>
+  <text class="mut" x="410" y="408">Garbage? → wrong baud (try 115200).</text>
+
+  <text class="mut" x="20" y="440">Source of the original annotated photo: DEF CON 32, Giese &amp; braelynn — see docs/references.md.</text>
+</svg>

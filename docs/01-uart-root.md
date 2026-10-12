@@ -6,6 +6,12 @@ lets us boot straight into a root shell.
 
 ## Wiring
 
+![UART debug-header pinout (redrawn reference)](images/uart-pinout.svg)
+
+*Redrawn reference — the original annotated photo is DEF CON 32 slide 87
+(Giese & braelynn), linked in [references.md](references.md). Verify the
+orientation against your own board.*
+
 - **3.3 V TTL** USB-UART adapter, **115200 8N1**, no flow control.
 - Connect **GND, TX, RX** only. **Do not connect the 3.3 V pin** — power the
   robot from its own battery, share only ground.
