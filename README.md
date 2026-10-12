@@ -36,6 +36,7 @@ Everything here is reconstructed from a single unit and from public research
 | [docs/03-decloud.md](docs/03-decloud.md) | Blocking the cloud while keeping the LAN (no iptables) |
 | [docs/04-sidebrush-patch.md](docs/04-sidebrush-patch.md) | Reverse-engineering + patching the "side brush stuck" stop |
 | [docs/05-file-transfer.md](docs/05-file-transfer.md) | Moving files on/off the robot over LAN |
+| [docs/references.md](docs/references.md) | Source links — incl. the DEF CON 32 talk PDF & **UART pinout slide** |
 
 Tools (ours, MIT):
 - [tools/ecopass.py](tools/ecopass.py) — offline root-password calculator
