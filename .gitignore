@@ -1,0 +1,16 @@
+# Never commit vendor firmware binaries (proprietary) or local junk
+*.so
+*.so.*
+*.bin
+*.pkg
+*.tar.*
+*.img
+roundtrip*
+dl_*
+_chk*
+__pycache__/
+*.pyc
+
+# Never commit device secrets (serial / password / iot creds / wifi)
+secrets*
+*.secret
