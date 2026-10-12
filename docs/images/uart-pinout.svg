@@ -48,7 +48,7 @@
   <!-- pad labels -->
   <text class="lbl" x="205" y="118">GND</text>
   <text class="red" x="205" y="132">3.3V (do NOT connect)</text>
-  <text class="lbl" x="205" y="165">RX &nbsp; TX</text>
+  <text class="lbl" x="205" y="165">RX  /  TX</text>
 
   <text class="cyan" x="96" y="230">UART</text>
 
