@@ -6,9 +6,13 @@ aarch64 binary with `capstone` + `pyelftools`. This is a hand-reconstruction for
 understanding — not Ecovacs source — but it matches the disassembly 1:1 and
 explains exactly what [the patch](patch-example.md) disables.
 
-> Tooling note: you can cross-check this with a decompiler of your choice (IDA /
-> Ghidra / Binary Ninja, or the REA agent decompiler — `npx rea-agents setup`,
-> if it supports aarch64). Everything below was derived from the disassembly.
+> Tooling note: the pseudocode below was first reconstructed from the
+> `capstone` disassembly, then **verified against Ghidra 12.1.4's decompiler**
+> (headless) — the raw Ghidra output is in the [appendix](#appendix-raw-ghidra-decompiler-output).
+> The [REA](https://github.com/morluto/rea) agent decompiler uses the same
+> engine, but its **Windows** build only accepts PE targets ("Windows Ghidra P0
+> accepts native PE … only"), so for this aarch64 ELF we drove Ghidra headless
+> directly (REA would work on Linux/WSL).
 
 ## The data: `g_motor_current`
 
@@ -107,3 +111,89 @@ two side-brush `state` writes short-circuits that escalation.
 (If a future unit instead faults via `libDeebot.so`'s navigation stuck
 framework — `rbot_stuck_det` / `RobotStuckWarning` with `STUCK *_side_brush` —
 the same reconstruct-then-NOP approach applies there.)
+
+## Appendix: raw Ghidra decompiler output
+
+Ground truth, straight from Ghidra 12.1.4 headless (image base `0x00100000`, so
+`FUN_0012abe0` = file vaddr `0x2abe0`). `PTR_g_motor_current_001443e0` is the
+pointer to `g_motor_current`; `* 0x24` = 36-byte stride. This confirms the
+reconstruction above 1:1.
+
+### Per-motor check — `FUN_0012abe0`
+
+```c
+undefined8 FUN_0012abe0(uint param_1,uint param_2,char param_3)   // (current, idx, mode)
+{
+  uint local_4;
+  // all three mode branches read the same field (+4 = limit):
+  if (param_3 == '\x01')      local_4 = *(uint *)(g + param_2*0x24 + 4);
+  else if (param_3 == '\x02') local_4 = *(uint *)(g + param_2*0x24 + 4);
+  else                        local_4 = *(uint *)(g + param_2*0x24 + 4);
+
+  if (param_1 < local_4) {                              // under threshold
+    *(u32*)(g + param_2*0x24 + 0xc) = 0;                // ctr_a = 0
+    if (*(int*)(g + param_2*0x24 + 0x14) != 0 &&
+        (++*(int*)(g + param_2*0x24 + 0x1c),
+         *(uint*)(g + param_2*0x24 + 0x20) <= *(uint*)(g + param_2*0x24 + 0x1c)))
+      *(u32*)(g + param_2*0x24 + 0x14) = 0;             // recovered -> clear ctr_b
+  } else {                                              // >= threshold
+    *(u32*)(g + param_2*0x24 + 0x1c) = 0;
+    ++*(int*)(g + param_2*0x24 + 0xc);
+    if (*(uint*)(g + param_2*0x24 + 0x10) <= *(uint*)(g + param_2*0x24 + 0xc)) {
+      *(u32*)(g + param_2*0x24 + 0xc) = 0;
+      ++*(int*)(g + param_2*0x24 + 0x14);
+      if (*(uint*)(g + param_2*0x24 + 0x18) <= *(uint*)(g + param_2*0x24 + 0x14)) {
+        g[param_2*0x24 + 1] = 1;                        // latch fault flag (+1)
+        *(u32*)(g + param_2*0x24 + 0x14) = 0;
+      }
+      return 1;
+    }
+  }
+  return 0;
+}
+```
+
+### Caller — `FUN_0012af8c` (← the four patched lines)
+
+```c
+void FUN_0012af8c(undefined1 *param_1)   // param_1 = per-motor current report
+{
+  char cVar1;
+  cVar1 = FUN_0012abe0(*(u32*)(param_1 + 0x30),0,*param_1);   // motor 0  (SIDE BRUSH)
+  if (cVar1 != '\0') {
+    if (g[1] == '\0') { if (*g != '\x02') *g = 1; }           // 0x2b00c  --> nop
+    else              *g = 2;                                 // 0x2afe4  --> nop
+  }
+  cVar1 = FUN_0012abe0(*(u32*)(param_1 + 0x34),1,*param_1);   // motor 1  (SIDE BRUSH)
+  if (cVar1 != '\0') {
+    if (g[0x25] == '\0') { if (g[0x24] != '\x02') g[0x24] = 1; } // 0x2b084 --> nop
+    else                 g[0x24] = 2;                            // 0x2b05c --> nop
+  }
+  // motors 2..5 (main brush / wheels / fan) left untouched:
+  cVar1 = FUN_0012abe0(*(u32*)(param_1 + 0x38),2,*param_1); if (cVar1) { if (g[0x49]=='\0'){if(g[0x48]!='\x02')g[0x48]=1;} else g[0x48]=2; }
+  cVar1 = FUN_0012abe0(*(u32*)(param_1 + 0x3c),3,*param_1); if (cVar1) { if (g[0x6d]=='\0'){if(g[0x6c]!='\x02')g[0x6c]=1;} else g[0x6c]=2; }
+  cVar1 = FUN_0012abe0(*(u32*)(param_1 + 0x40),4,*param_1); if (cVar1) { if (g[0x91]=='\0'){if(g[0x90]!='\x02')g[0x90]=1;} else g[0x90]=2; }
+  cVar1 = FUN_0012abe0(*(u32*)(param_1 + 0x44),5,*param_1); if (cVar1) { if (g[0xb5]=='\0'){if(g[0xb4]!='\x02')g[0xb4]=1;} else g[0xb4]=2; }
+}
+```
+
+The four `*g = 2 / 1` and `g[0x24] = 2 / 1` stores (motors 0 and 1) are exactly
+the `strb` instructions replaced with `nop` — see [patch-example.md](patch-example.md).
+
+### `MotorCurrentCheckParameterInit`
+
+```c
+void MotorCurrentCheckParameterInit(void)
+{
+  FUN_0012aa94(g + 0x48, 0x44c, 300, 2, 0xc, 0x32);  // idx 2 main brush (1100/300)
+  FUN_0012aa94(g,        0x118, 100, 4, 0xc, 0x32);  // idx 0 SIDE BRUSH (280/100)
+  FUN_0012aa94(g + 0x24, 0x118, 100, 4, 0xc, 0x32);  // idx 1 SIDE BRUSH (280/100)
+  FUN_0012aa94(g + 0x6c, 700, 300, 3, 6, 0x32);      // idx 3 wheel
+  FUN_0012aa94(g + 0x90, 700, 300, 3, 6, 0x32);      // idx 4 wheel
+  FUN_0012aa94(g + 0xb4, 600, 300, 2, 3, 0x32);      // idx 5 fan
+}
+```
+
+> Reproduce: `GHIDRA_INSTALL_DIR=<ghidra-12.1.x> support/analyzeHeadless <proj>
+> p -import liberos_node_alert.so -postScript DecompileAt.java` with a small
+> GhidraScript that decompiles `imageBase + {0x2abe0,0x2af8c,0x2aaf8}`.
